@@ -1,20 +1,30 @@
-function Lab=xyz2lab(XYZ,XoYoZo) 
-% Lab=xyz2lab(XYZ,XoYoZo) 
-% 
-% XoYoZo = CIEXYZ-värden för vitpunkten (belysningen). 
-% XYZ = CIEXYZ-värden för färgen som ska kopieras till CIELab-värden
-% Lab = CIELAB-värden för den konverterade färgen. 
+function Lab=xyz2lab(XYZ,XoYoZo)
+% Lab=xyz2lab(XYZ,XoYoZo)
+%
+% XoYoZo = CIEXYZ-värden för vitpunkten (belysningen).
+% XYZ = CIEXYZ-värden för färgen som ska konverteras till CIELAB-värden.
+% Lab = CIELAB-värden för den konverterade färgen.
+% Formlerna för konvertering återfinns i laboration 3.
+% Martin Solli, marso@itn.liu.se
+% Linköpings Universitet, Sweden.
+% September 2004
+    
+XYZrel(:,1) = XYZ(:,1) ./ XoYoZo(:,1);
+XYZrel(:,2) = XYZ(:,2) ./ XoYoZo(:,2);
+XYZrel(:,3) = XYZ(:,3) ./ XoYoZo(:,3);
+fXYZ = XYZrel .^ (1/3);
+[r, c] = find(XYZrel <= 0.008856);
 
-Xn = XoYoZo(1);
-Yn = XoYoZo(2);
-Zn = XoYoZo(3);
+if (r > 0)
+    for n = 1:size(r, 1)
+        fXYZ(r(n),c(n)) = 7.787 * XYZrel(r(n), c(n)) + 16 / 116;
+    end
+end
 
-x = XYZ(1);
-y = XYZ(2);
-z = XYZ(3);
-
-ylim = Yn*0.008856;
-L = (y>ylim).*(116*(y/Yn).^(1/3)-16)+(y<=ylim).*(903.3*y/Yn);
-ytemp = foo(y/Yn);
-a = 500*(foo(x/Xn)-ytemp);
-b = 200*(ytemp-foo(z/Zn));
+r2 = find(c==2);
+L = 116 * fXYZ(:,2) - 16;
+L(r(r2)) = 903.3 * XYZrel(r(r2), 2);
+a = 500 * (fXYZ(:,1) - fXYZ(:,2));
+b = 200 * (fXYZ(:,2) - fXYZ(:,3));
+Lab = [L,a,b];
+return;

@@ -16,4 +16,20 @@ function XYZ=colorsignal2xyz(reflectance,illumination)
 % våglängder). 
 % Ex: reflectance = ones(1,61); 
  
-color = reflectance.*illumination;
+% Martin Solli, marso@itn.liu.se
+% ITN, Linköpings Universitet
+
+load 'xyz.mat';
+
+if (size(reflectance, 1) == 61)
+    reflectance = reflectance';
+end;
+if (size(illumination,1) == 61)
+    illumination = illumination';
+end;
+
+colorsignal = reflectance * diag(illumination);
+XYZ = colorsignal * xyz;
+k = 100 / (illumination * xyz(:,2));
+XYZ = XYZ .* k;
+return;
