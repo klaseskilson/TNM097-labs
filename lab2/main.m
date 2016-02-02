@@ -40,7 +40,7 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_cal(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2))
+diff = sqrt(sum((lab_cal(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
@@ -56,15 +56,14 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_better(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2))
+diff = sqrt(sum((lab_better(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
 %% 3.3 Use polynomial regression!
-w = Optimize_poly(rgb_cal', xyz_ref')
+w = Optimize_poly(rgb_cal', xyz_ref');
 xyz_poly = Polynomial_regression(rgb_cal', w)';
-
 
 lab_poly = zeros(size(xyz_poly));
 for i = 1:size(rgb_cal, 1)
@@ -72,8 +71,27 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_poly(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2))
+diff = sqrt(sum((lab_poly(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
+%% 4.1 Spectral forward model
+load('DLP.mat');
+s_rgb = rgb_raw * DLP';
+
+% convert to xyz
+dlp_proj = sum(DLP, 2);
+xyz_proj = colorsignal2xyz(ones(1,61), dlp_proj);
+xyz_dlp = zeros(size(rgb_raw));
+lab_dlp = zeros(size(rgb_raw));
+for i=1:size(rgb_raw, 1)
+    xyz_dlp(i,:) = colorsignal2xyz(s_rgb(i,:), dlp_proj);
+    lab_dlp(i,:) = xyz2lab(xyz_dlp(i,:), xyz_proj);
+end
+
+% calculate euclidean distance
+diff = sqrt(sum((lab_dlp(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+max_diff = max(diff)
+mean_diff = mean(diff)
+median_diff = median(diff)
