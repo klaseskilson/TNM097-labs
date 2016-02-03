@@ -100,3 +100,20 @@ median_diff = median(diff)
 
 %% 4.2 SFM with calibrated rgb values
 
+s_rgb_cal = rgb_cal * DLP';
+
+% convert to xyz
+xyz_dlp_cal = zeros(size(rgb_cal));
+lab_dlp_cal = zeros(size(rgb_cal));
+for i=1:size(rgb_cal, 1)
+    xyz_dlp_cal(i,:) = colorsignal2xyz(s_rgb_cal(i,:), dlp_proj);
+    lab_dlp_cal(i,:) = xyz2lab(xyz_dlp_cal(i,:), xyz_proj);
+end
+
+% calculate euclidean distance
+diff = sqrt(sum((lab_dlp_cal(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+max_diff = max(diff)
+mean_diff = mean(diff)
+median_diff = median(diff)
+
+%% 5.1 Inverse model of the output device
