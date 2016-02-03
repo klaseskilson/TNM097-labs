@@ -116,4 +116,23 @@ max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
-%% 5.1 Inverse model of the output device
+%% 5.1 Output device model
+A_crt = xyz_dlp_cal' * rgb_cal; % wat
+
+%% 5.2 
+xyz_better_proj = zeros(size(rgb_cal));
+lab_better_proj = zeros(size(rgb_cal));
+for i = 1:size(rgb_cal, 1)
+    xyz_better_proj(i, :) = A_crt \ rgb_cal(i, :)';
+    lab_better_proj(i, :) = xyz2lab(xyz_better_proj(i, :), xyz_d65);
+end
+
+% calculate euclidean distance
+diff = sqrt(sum((lab_better_proj(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+max_diff = max(diff)
+mean_diff = mean(diff)
+median_diff = median(diff)
+
+% something is wrong
+
+%% 
