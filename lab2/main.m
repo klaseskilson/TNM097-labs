@@ -80,9 +80,11 @@ median_diff = median(diff)
 load('DLP.mat');
 s_rgb = rgb_raw * DLP';
 
-% convert to xyz
+% prepare for xyz conversion
 dlp_proj = sum(DLP, 2);
 xyz_proj = colorsignal2xyz(ones(1,61), dlp_proj);
+
+% convert to xyz
 xyz_dlp = zeros(size(rgb_raw));
 lab_dlp = zeros(size(rgb_raw));
 for i=1:size(rgb_raw, 1)
@@ -95,3 +97,6 @@ diff = sqrt(sum((lab_dlp(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
+
+%% 4.2 SFM with calibrated rgb values
+
