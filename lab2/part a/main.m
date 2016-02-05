@@ -108,14 +108,15 @@ median_diff = median(diff)
 %% 4.2 SFM with calibrated rgb values
 s_rgb_cal = rgb_cal * DLP';
 
+% calculate normalization factor
+k = 100 / (dlp_proj' * xyz(:,2));
+
 % convert to xyz
 xyz_dlp_cal = zeros(size(rgb_cal));
 lab_dlp_cal = zeros(size(rgb_cal));
 for i=1:size(rgb_cal, 1)
     % apply xyz matrix to rgb spectral values
     xyz_dlp_cal(i,:) = s_rgb_cal(i,:) * xyz;
-    % calculate normalization factor
-    k = 100 / (dlp_proj' * xyz(:,2));
     % apply k
     xyz_dlp_cal(i,:) = xyz_dlp_cal(i,:) .* k;
     % convert to rgb
@@ -129,18 +130,23 @@ mean_diff = mean(diff)
 median_diff = median(diff)
 
 %% 5.1 Output device model
-A_crt = xyz_dlp_cal' * rgb_cal; % wat
+A_crt = zeros(3,3);
+
+A_crt(1,:) = (DLP' * xyz(:,1))';
+A_crt(2,:) = (DLP' * xyz(:,2))';
+A_crt(3,:) = (DLP' * xyz(:,3))';
+A_crt = A_crt .* k;
 
 %% 5.2 
 xyz_better_proj = zeros(size(rgb_cal));
 lab_better_proj = zeros(size(rgb_cal));
 for i = 1:size(rgb_cal, 1)
-    xyz_better_proj(i, :) = inv(A_crt) * rgb_cal(i, :)';
+    xyz_better_proj(i, :) = (A_crt * rgb_cal(i, :)')';
     lab_better_proj(i, :) = xyz2lab(xyz_better_proj(i, :), xyz_d65);
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_better_proj(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_better_proj(:, 1:3) - lab_ref(:, 1:3)) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
