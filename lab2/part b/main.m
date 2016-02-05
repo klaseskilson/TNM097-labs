@@ -5,12 +5,17 @@ load('Magenta.mat');
 figure;
 plot(Spec_150(1,:), 'b')
 hold on;
-plot(Spec_150(13,:), 'r')
 plot(Spec_150(20,:), 'g')
-plot( Spec_150(20,:)*An(1) + (1-An(1)) * Spec_150(1,:), 'b--')
+plot(Spec_300(20,:), 'gx')
+plot(Spec_600(20,:), 'g--')
 
-plot( Spec_150(20,:)*An(13) + (1-An(13)) * Spec_150(1,:), 'r--')
-plot( Spec_150(20,:)*An(20) + (1-An(20)) * Spec_150(1,:), 'g--')
-
+% 50%!
+plot(Spec_150(20,:)*An(13) + (1-An(13)) * Spec_150(1,:), 'r--')
+plot(Spec_300(20,:)*An(13) + (1-An(13)) * Spec_300(1,:), 'm--')
+plot(Spec_600(20,:)*An(13) + (1-An(13)) * Spec_600(1,:), 'k--')
+plot(Spec_150(13,:), 'rx')
 plot(Spec_300(13,:), 'mx')
 plot(Spec_600(13,:), 'kx')
+
+%% 6.2 Effective ink coverage
+
