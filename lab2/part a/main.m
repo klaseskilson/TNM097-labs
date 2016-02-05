@@ -40,7 +40,7 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_cal(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_cal - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
@@ -56,7 +56,7 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_better(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_better - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
@@ -71,7 +71,7 @@ for i = 1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_poly(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_poly - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
@@ -85,14 +85,15 @@ s_rgb = rgb_raw * DLP';
 dlp_proj = sum(DLP, 2);
 xyz_proj = colorsignal2xyz(ones(1,61), dlp_proj);
 
+% calculate normalization factor
+k = 100 / (dlp_proj' * xyz(:,2));
+
 % convert to xyz
 xyz_dlp = zeros(size(rgb_raw));
 lab_dlp = zeros(size(rgb_raw));
 for i=1:size(rgb_raw, 1)
     % apply xyz matrix to rgb spectral values
     xyz_dlp(i,:) = s_rgb(i,:) * xyz;
-    % calculate normalization factor
-    k = 100 / (dlp_proj' * xyz(:,2));
     % apply k
     xyz_dlp(i,:) = xyz_dlp(i,:) .* k;
     % convert to rgb
@@ -100,16 +101,13 @@ for i=1:size(rgb_raw, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_dlp(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_dlp - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
 %% 4.2 SFM with calibrated rgb values
 s_rgb_cal = rgb_cal * DLP';
-
-% calculate normalization factor
-k = 100 / (dlp_proj' * xyz(:,2));
 
 % convert to xyz
 xyz_dlp_cal = zeros(size(rgb_cal));
@@ -124,7 +122,7 @@ for i=1:size(rgb_cal, 1)
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_dlp_cal(:, 2:3) - lab_ref(:, 2:3)) .^ 2, 2));
+diff = sqrt(sum((lab_dlp_cal - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
@@ -138,15 +136,18 @@ A_crt(3,:) = (DLP' * xyz(:,3))';
 A_crt = A_crt .* k;
 
 %% 5.2 
+rgb_better_proj = zeros(size(rgb_cal));
 xyz_better_proj = zeros(size(rgb_cal));
 lab_better_proj = zeros(size(rgb_cal));
 for i = 1:size(rgb_cal, 1)
-    xyz_better_proj(i, :) = (A_crt * rgb_cal(i, :)')';
+    rgb_better_proj(i, :) = (inv(A_crt) * xyz_poly(i, :)')';
+    % apply xyz (CMF) to new spectral values
+    xyz_better_proj(i, :) = (rgb_better_proj(i,:) * DLP') * xyz .* k;
     lab_better_proj(i, :) = xyz2lab(xyz_better_proj(i, :), xyz_d65);
 end
 
 % calculate euclidean distance
-diff = sqrt(sum((lab_better_proj(:, 1:3) - lab_ref(:, 1:3)) .^ 2, 2));
+diff = sqrt(sum((lab_better_proj - lab_ref) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
