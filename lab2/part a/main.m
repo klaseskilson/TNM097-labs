@@ -76,8 +76,9 @@ max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
-%% 4.1 Spectral forward model
+%% 4.1 Spectral forward model for DLP output
 load('DLP.mat');
+load('xyz.mat');
 s_rgb = rgb_raw * DLP';
 
 % prepare for xyz conversion
@@ -88,7 +89,13 @@ xyz_proj = colorsignal2xyz(ones(1,61), dlp_proj);
 xyz_dlp = zeros(size(rgb_raw));
 lab_dlp = zeros(size(rgb_raw));
 for i=1:size(rgb_raw, 1)
-    xyz_dlp(i,:) = colorsignal2xyz(s_rgb(i,:), dlp_proj);
+    % apply xyz matrix to rgb spectral values
+    xyz_dlp(i,:) = s_rgb(i,:) * xyz;
+    % calculate normalization factor
+    k = 100 / (dlp_proj' * xyz(:,2));
+    % apply k
+    xyz_dlp(i,:) = xyz_dlp(i,:) .* k;
+    % convert to rgb
     lab_dlp(i,:) = xyz2lab(xyz_dlp(i,:), xyz_proj);
 end
 
@@ -99,14 +106,19 @@ mean_diff = mean(diff)
 median_diff = median(diff)
 
 %% 4.2 SFM with calibrated rgb values
-
 s_rgb_cal = rgb_cal * DLP';
 
 % convert to xyz
 xyz_dlp_cal = zeros(size(rgb_cal));
 lab_dlp_cal = zeros(size(rgb_cal));
 for i=1:size(rgb_cal, 1)
-    xyz_dlp_cal(i,:) = colorsignal2xyz(s_rgb_cal(i,:), dlp_proj);
+    % apply xyz matrix to rgb spectral values
+    xyz_dlp_cal(i,:) = s_rgb_cal(i,:) * xyz;
+    % calculate normalization factor
+    k = 100 / (dlp_proj' * xyz(:,2));
+    % apply k
+    xyz_dlp_cal(i,:) = xyz_dlp_cal(i,:) .* k;
+    % convert to rgb
     lab_dlp_cal(i,:) = xyz2lab(xyz_dlp_cal(i,:), xyz_proj);
 end
 
@@ -123,7 +135,7 @@ A_crt = xyz_dlp_cal' * rgb_cal; % wat
 xyz_better_proj = zeros(size(rgb_cal));
 lab_better_proj = zeros(size(rgb_cal));
 for i = 1:size(rgb_cal, 1)
-    xyz_better_proj(i, :) = A_crt \ rgb_cal(i, :)';
+    xyz_better_proj(i, :) = inv(A_crt) * rgb_cal(i, :)';
     lab_better_proj(i, :) = xyz2lab(xyz_better_proj(i, :), xyz_d65);
 end
 
