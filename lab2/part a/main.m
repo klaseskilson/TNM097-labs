@@ -139,10 +139,12 @@ A_crt = A_crt .* k;
 rgb_better_proj = zeros(size(rgb_cal));
 xyz_better_proj = zeros(size(rgb_cal));
 lab_better_proj = zeros(size(rgb_cal));
+proj_spectra = zeros(size(chips20));
 for i = 1:size(rgb_cal, 1)
     rgb_better_proj(i, :) = (inv(A_crt) * xyz_poly(i, :)')';
     % apply xyz (CMF) to new spectral values
-    xyz_better_proj(i, :) = (rgb_better_proj(i,:) * DLP') * xyz .* k;
+    proj_spectra(i, :) = rgb_better_proj(i,:) * DLP';
+    xyz_better_proj(i, :) = proj_spectra(i, :) * xyz .* k;
     lab_better_proj(i, :) = xyz2lab(xyz_better_proj(i, :), xyz_d65);
 end
 
@@ -152,6 +154,8 @@ max_diff = max(diff)
 mean_diff = mean(diff)
 median_diff = median(diff)
 
-% something is wrong
-
-%% 
+%% 5.3 Plot and compare
+figure;
+spectra = (illum .* chips20);
+plot(spectra(1,:), 'b--'); hold on;
+plot(proj_spectra(1,:), 'b');
