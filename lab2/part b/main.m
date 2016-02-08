@@ -20,10 +20,25 @@ plot(Spec_600(13,:), 'kx')
 %% 6.2 Effective ink coverage
 figure;
 hold on;
-a_eff = zeros(size(Spec_150));
-for i = 1:size(Spec_150, 1);
-    a_eff(i,:) = (Spec_150(i,:) - Spec_150(1,:)) ./ (Spec_150(20,:) - Spec_150(1,:));
+coverage_150 = zeros(size(Spec_150));
+coverage_300 = zeros(size(Spec_150));
+coverage_600 = zeros(size(Spec_150));
+for i = 1:size(coverage_150, 1);
+    coverage_150(i,:) = (Spec_150(i,:) - Spec_150(1,:)) ./ (Spec_150(20,:) - Spec_150(1,:));
+    coverage_300(i,:) = (Spec_300(i,:) - Spec_300(1,:)) ./ (Spec_300(20,:) - Spec_300(1,:));
+    coverage_600(i,:) = (Spec_600(i,:) - Spec_600(1,:)) ./ (Spec_600(20,:) - Spec_600(1,:));
     legendInfo{i} = ['X = ' num2str(An(i) * 100) '%'];
 end;
-plot(a_eff');
+
+plot(coverage_150');
 legend(legendInfo);
+
+%% 6.3 Total dot gain
+figure;
+hold on;
+selected_wl = 20;
+plot(An, coverage_150(:, selected_wl) - An');
+plot(An, coverage_300(:, selected_wl) - An', 'x');
+plot(An, coverage_600(:, selected_wl) - An', '--');
+plot(An, An - An)
+legend('150 dpi', '300 dpi', '600 dpi', 'An');
