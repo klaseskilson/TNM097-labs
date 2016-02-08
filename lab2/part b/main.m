@@ -78,5 +78,22 @@ max_diff = max(diff)
 mean_diff = mean(diff)
 
 %% 8.2 Color prediction using Murray-Davies
-c_coverage = (c150(:,1) - c150(1,1)) ./ (c150(21,1) - c150(1,1));
-m_coverage = (m150(:,2) - m150(1,2)) ./ (m150(21,2) - m150(1,2));
+coverage_c = (c150(:,1) - c150(1,1)) ./ (c150(21,1) - c150(1,1));
+coverage_m = (m150(:,2) - m150(1,2)) ./ (m150(21,2) - m150(1,2));
+
+%% 8.3 
+
+coverage_c_i = interp1(c150(:,4), coverage_c, rand150(:,4));
+coverage_m_i = interp1(m150(:,4), coverage_m, rand150(:,5));
+
+frac_w_i = (1 - coverage_c_i) .* (1 - coverage_m_i);
+frac_c_i = coverage_c_i .* (1 - coverage_m_i);
+frac_m_i = (1 - coverage_c_i) .* coverage_m_i;
+frac_b_i = coverage_c_i .* coverage_m_i;
+
+predic_i = frac_w_i * paper + frac_c_i * cyan + frac_m_i * magenta + frac_b_i * blue;
+predic_lab_i = xyz2lab(predic_i, paper);
+
+diff = sqrt(sum((predic_lab_i - rand_lab) .^ 2, 2));
+max_diff = max(diff)
+mean_diff = mean(diff)
