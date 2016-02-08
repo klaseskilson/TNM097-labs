@@ -45,3 +45,13 @@ plot(An, total_gain_300, 'x');
 plot(An, total_gain_600, '--');
 plot(An, An - An)
 legend('150 dpi', '300 dpi', '600 dpi', 'An');
+
+%% 7.1
+close all;
+pup = double(rgb2gray(imread('puppy.jpg')));
+pup = pup / max(pup(:));
+pup_error = interp1(An, total_gain_150, pup);
+new_pup = pup - pup_error;
+figure;
+subplot(1,2,1), imshow(pup);
+subplot(1,2,2), imshow(new_pup);
