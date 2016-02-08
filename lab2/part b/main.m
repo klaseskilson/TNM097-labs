@@ -46,12 +46,12 @@ plot(An, total_gain_600, '--');
 plot(An, An - An)
 legend('150 dpi', '300 dpi', '600 dpi', 'An');
 
-%% 7.1
+%% 7.1 Dot gain compensation
 close all;
+a_eff = coverage_150(:, selected_wl);
 pup = double(rgb2gray(imread('puppy.jpg')));
 pup = pup / max(pup(:));
-pup_error = interp1(An, total_gain_150, pup);
-new_pup = pup - pup_error;
+pup_out = 1 - interp1(a_eff, An, 1 - pup);
 figure;
 subplot(1,2,1), imshow(pup);
-subplot(1,2,2), imshow(new_pup);
+subplot(1,2,2), imshow(pup_out);
