@@ -37,8 +37,11 @@ legend(legendInfo);
 figure;
 hold on;
 selected_wl = 20;
-plot(An, coverage_150(:, selected_wl) - An');
-plot(An, coverage_300(:, selected_wl) - An', 'x');
-plot(An, coverage_600(:, selected_wl) - An', '--');
+total_gain_150 = coverage_150(:, selected_wl) - An';
+total_gain_300 = coverage_300(:, selected_wl) - An';
+total_gain_600 = coverage_600(:, selected_wl) - An';
+plot(An, total_gain_150);
+plot(An, total_gain_300, 'x');
+plot(An, total_gain_600, '--');
 plot(An, An - An)
 legend('150 dpi', '300 dpi', '600 dpi', 'An');
