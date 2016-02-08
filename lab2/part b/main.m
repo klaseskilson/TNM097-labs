@@ -55,3 +55,26 @@ pup_out = 1 - interp1(a_eff, An, 1 - pup);
 figure;
 subplot(1,2,1), imshow(pup);
 subplot(1,2,2), imshow(pup_out);
+
+%% 8.1 Color prediction
+load('CM.mat');
+
+frac_w = (1 - rand150(:,4)) .* (1 - rand150(:,5));
+frac_c = rand150(:,4) .* (1 - rand150(:,5));
+frac_m = (1 - rand150(:,4)) .* rand150(:,5);
+frac_b = rand150(:,4) .* rand150(:,5);
+
+paper = c150(1, 1:3);
+cyan = c150(21, 1:3);
+magenta = m150(21, 1:3);
+blue = b150(21, 1:3);
+
+predic = frac_w * paper + frac_c * cyan + frac_m * magenta + frac_b * blue;
+predic_lab = xyz2lab(predic, paper);
+rand_lab = xyz2lab(rand150(:, 1:3), paper);
+
+diff = sqrt(sum((predic_lab - rand_lab) .^ 2, 2));
+max_diff = max(diff)
+mean_diff = mean(diff)
+
+%% 8.2 
