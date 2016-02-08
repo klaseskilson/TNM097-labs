@@ -77,4 +77,6 @@ diff = sqrt(sum((predic_lab - rand_lab) .^ 2, 2));
 max_diff = max(diff)
 mean_diff = mean(diff)
 
-%% 8.2 
+%% 8.2 Color prediction using Murray-Davies
+c_coverage = (c150(:,1) - c150(1,1)) ./ (c150(21,1) - c150(1,1));
+m_coverage = (m150(:,2) - m150(1,2)) ./ (m150(21,2) - m150(1,2));
