@@ -127,22 +127,52 @@ ppi = 72;
 distance = 500 / 25.4;
 sampPerDeg = ppi * distance * tan(pi/180);
 
-scie = scielab(sampPerDeg, pc, pc_xyz, wp, 'xyz');
-scie_bicubic = scielab(sampPerDeg, pc_bicubic, pc_bicubic_xyz, wp, 'xyz');
-scie_nearest = scielab(sampPerDeg, pc_nearest, pc_nearest_xyz, wp, 'xyz');
-scie_bilinear = scielab(sampPerDeg, pc_bilinear, pc_bilinear_xyz, wp, 'xyz');
+scie_bicubic = scielab(sampPerDeg, pc_xyz, pc_bicubic_xyz, wp, 'xyz');
+scie_nearest = scielab(sampPerDeg, pc_xyz, pc_nearest_xyz, wp, 'xyz');
+scie_bilinear = scielab(sampPerDeg, pc_xyz, pc_bilinear_xyz, wp, 'xyz');
 
-scie_mean = mean(scie(:));
 scie_bicubic_mean = mean(scie_bicubic(:));
 scie_nearest_mean = mean(scie_nearest(:));
 scie_bilinear_mean = mean(scie_bilinear(:));
 
-disp([num2str(scie_mean) ' unchanged ' num2str(scie_nearest_mean) ' nearest ' num2str(scie_bilinear_mean) ' bilinear ' num2str(scie_bicubic_mean) ' bicubic'])
+disp([num2str(scie_nearest_mean) ' nearest ' num2str(scie_bilinear_mean) ' bilinear ' num2str(scie_bicubic_mean) ' bicubic'])
 
 subplot(2,2,1), imshow(pc);
 subplot(2,2,2), imshow(pc_nearest);
 subplot(2,2,3), imshow(pc_bilinear);
 subplot(2,2,4), imshow(pc_bicubic);
 
+figure;
+subplot(1,3,1), imshow(uint8(scie_nearest));
+subplot(1,3,2), imshow(uint8(scie_bilinear));
+subplot(1,3,3), imshow(uint8(scie_bicubic));
+
 %% 4.2 S-CIELab as a no-reference metric
+
+load('colorhalftones.mat');
+
+c1_xyz = rgb2xyz(c1, 'WhitePoint', wp);
+c2_xyz = rgb2xyz(c2, 'WhitePoint', wp);
+c3_xyz = rgb2xyz(c3, 'WhitePoint', wp);
+c4_xyz = rgb2xyz(c4, 'WhitePoint', wp);
+c5_xyz = rgb2xyz(c5, 'WhitePoint', wp);
+c1_scie = scielab(sampPerDeg, c1_xyz);
+c2_scie = scielab(sampPerDeg, c2_xyz);
+c3_scie = scielab(sampPerDeg, c3_xyz);
+c4_scie = scielab(sampPerDeg, c4_xyz);
+c5_scie = scielab(sampPerDeg, c5_xyz);
+
+c1_std = std(c1_scie(:));
+c2_std = std(c2_scie(:));
+c3_std = std(c3_scie(:));
+c4_std = std(c4_scie(:));
+c5_std = std(c5_scie(:));
+
+disp(['c1 std: ' num2str(c1_std) ' c2 std: ' num2str(c2_std) ' c3 std: ' num2str(c3_std) ' c4 std: ' num2str(c4_std) ' c5 std: ' num2str(c5_std)])
+
+subplot(2, 3, 1), imshow(c1);
+subplot(2, 3, 2), imshow(c2);
+subplot(2, 3, 3), imshow(c3);
+subplot(2, 3, 4), imshow(c4);
+subplot(2, 3, 5), imshow(c5);
 
