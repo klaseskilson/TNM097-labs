@@ -49,7 +49,7 @@ subplot(1,2,2), imshow(p_dither)
 
 %% 2.2 Color image
 
-pc = imread('peppers_color.tif');
+pc = im2double(imread('peppers_color.tif'));
 pc_lab = rgb2lab(pc);
 
 pc_thresh(:,:,1) = pc(:,:,1) >= 0.5;
@@ -81,5 +81,32 @@ subplot(1,3,3), imshow(pc_dither);
 
 %% 3 Mathematical metrics involving HVS
 
+% grayscale!
 SNRfilter_dither = snr_filter(p, p - p_dither);
 SNRfilter_thresh = snr_filter(p, p - p_thresh);
+
+% color!
+pc_hvs = rgb_filter(pc);
+pc_thresh_hvs = rgb_filter(pc_thresh);
+pc_dither_hvs = rgb_filter(pc_dither);
+
+pc_hvs_lab = rgb2lab(pc_hvs);
+pc_thresh_hvs_lab = rgb2lab(pc_thresh_hvs);
+pc_dither_hvs_lab = rgb2lab(pc_dither_hvs);
+
+subplot(1,4,1), imshow(pc);
+subplot(1,4,2), imshow(pc_hvs);
+subplot(1,4,3), imshow(pc_thresh_hvs);
+subplot(1,4,4), imshow(pc_dither_hvs);
+
+% calc delta e
+diff_thresh_hsv = sqrt(sum((pc_thresh_hvs_lab - pc_hvs_lab) .^ 2, 2));
+diff_dither_hsv = sqrt(sum((pc_dither_hvs_lab - pc_hvs_lab) .^ 2, 2));
+
+diff_thresh_hsv_max = max(diff_thresh_hsv(:));
+diff_thresh_hsv_mean = mean(diff_thresh_hsv(:));
+diff_dither_hsv_max = max(diff_dither_hsv(:));
+diff_dither_hsv_mean = mean(diff_dither_hsv(:));
+disp(['thresh max: ' num2str(diff_thresh_hsv_max) ' mean: ' num2str(diff_thresh_hsv_mean)])
+disp(['dither max: ' num2str(diff_dither_hsv_max) ' mean: ' num2str(diff_dither_hsv_mean)])
+disp('Oh! Piece of candy!');
