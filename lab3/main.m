@@ -110,3 +110,5 @@ diff_dither_hsv_mean = mean(diff_dither_hsv(:));
 disp(['thresh max: ' num2str(diff_thresh_hsv_max) ' mean: ' num2str(diff_thresh_hsv_mean)])
 disp(['dither max: ' num2str(diff_dither_hsv_max) ' mean: ' num2str(diff_dither_hsv_mean)])
 disp('Oh! Piece of candy!');
+
+
