@@ -35,3 +35,17 @@ subplot(2,2,4), imshow(p_bicubic)
 
 %% 2.1.2 Grayscale image halftoning
 
+p_thresh = double(p >= 0.5);
+p_dither = double(dither(p));
+
+MSE_dither = mean(mean((p - p_dither).^2));
+MSE_thresh = mean(mean((p - p_thresh).^2));
+
+SNR_dither = snr(p, p - p_dither);
+SNR_thresh = snr(p, p - p_thresh);
+
+subplot(1,2,1), imshow(p_thresh)
+subplot(1,2,2), imshow(p_dither)
+
+%% 2.2 Color image
+
