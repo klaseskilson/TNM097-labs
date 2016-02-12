@@ -49,3 +49,32 @@ subplot(1,2,2), imshow(p_dither)
 
 %% 2.2 Color image
 
+pc = imread('peppers_color.tif');
+pc_lab = rgb2lab(pc);
+
+pc_thresh(:,:,1) = pc(:,:,1) >= 0.5;
+pc_thresh(:,:,2) = pc(:,:,2) >= 0.5;
+pc_thresh(:,:,3) = pc(:,:,3) >= 0.5;
+pc_thresh = double(pc_thresh);
+
+pc_dither(:,:,1) = dither(pc(:,:,1));
+pc_dither(:,:,2) = dither(pc(:,:,2));
+pc_dither(:,:,3) = dither(pc(:,:,3));
+pc_dither = double(pc_dither);
+
+pc_thresh_lab = rgb2lab(pc_thresh);
+pc_dither_lab = rgb2lab(pc_dither);
+
+diff_thresh = sqrt(sum((pc_thresh_lab - pc_lab) .^ 2, 2));
+diff_dither = sqrt(sum((pc_dither_lab - pc_lab) .^ 2, 2));
+
+diff_thresh_max = max(diff_thresh(:));
+diff_thresh_mean = mean(diff_thresh(:));
+diff_dither_max = max(diff_dither(:));
+diff_dither_mean = mean(diff_dither(:));
+disp(['thresh max: ' num2str(diff_thresh_max) ' mean: ' num2str(diff_thresh_mean)])
+disp(['dither max: ' num2str(diff_dither_max) ' mean: ' num2str(diff_dither_mean)])
+
+subplot(1,3,1), imshow(pc);
+subplot(1,3,2), imshow(pc_thresh);
+subplot(1,3,3), imshow(pc_dither);
