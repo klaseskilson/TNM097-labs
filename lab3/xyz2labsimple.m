@@ -1,4 +1,4 @@
-function [L,a,b]=xyz2lab(x,y,z)
+function [L,a,b]=xyz2labsimple(x,y,z)
 
 Xn = 95.05;
 Yn = 100.00;
