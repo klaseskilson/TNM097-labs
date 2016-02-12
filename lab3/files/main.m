@@ -78,3 +78,8 @@ disp(['dither max: ' num2str(diff_dither_max) ' mean: ' num2str(diff_dither_mean
 subplot(1,3,1), imshow(pc);
 subplot(1,3,2), imshow(pc_thresh);
 subplot(1,3,3), imshow(pc_dither);
+
+%% 3 Mathematical metrics involving HVS
+
+SNRfilter_dither = snr_filter(p, p - p_dither);
+SNRfilter_thresh = snr_filter(p, p - p_thresh);
