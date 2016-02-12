@@ -3,7 +3,7 @@ clear all;
 
 load('DLP.mat');
 load('xyz.mat');
-XYZdlp = sum(DLP, 2)' * xyz;
+XYZdlp = DLP' * xyz;
 
 load('Dell.mat');
 load('Inkjet.mat');
@@ -65,8 +65,8 @@ pc_dither = double(pc_dither);
 pc_thresh_lab = rgb2lab(pc_thresh);
 pc_dither_lab = rgb2lab(pc_dither);
 
-diff_thresh = sqrt(sum((pc_thresh_lab - pc_lab) .^ 2, 2));
-diff_dither = sqrt(sum((pc_dither_lab - pc_lab) .^ 2, 2));
+diff_thresh = sqrt(sum((pc_thresh_lab - pc_lab) .^ 2, 3));
+diff_dither = sqrt(sum((pc_dither_lab - pc_lab) .^ 2, 3));
 
 diff_thresh_max = max(diff_thresh(:));
 diff_thresh_mean = mean(diff_thresh(:));
@@ -100,8 +100,8 @@ subplot(1,4,3), imshow(pc_thresh_hvs);
 subplot(1,4,4), imshow(pc_dither_hvs);
 
 % calc delta e
-diff_thresh_hsv = sqrt(sum((pc_thresh_hvs_lab - pc_hvs_lab) .^ 2, 2));
-diff_dither_hsv = sqrt(sum((pc_dither_hvs_lab - pc_hvs_lab) .^ 2, 2));
+diff_thresh_hsv = sqrt(sum((pc_thresh_hvs_lab - pc_hvs_lab) .^ 2, 3));
+diff_dither_hsv = sqrt(sum((pc_dither_hvs_lab - pc_hvs_lab) .^ 2, 3));
 
 diff_thresh_hsv_max = max(diff_thresh_hsv(:));
 diff_thresh_hsv_mean = mean(diff_thresh_hsv(:));
@@ -123,8 +123,8 @@ pc_bicubic_xyz = rgb2xyz(pc_bicubic, 'WhitePoint', wp);
 pc_nearest_xyz = rgb2xyz(pc_nearest, 'WhitePoint', wp);
 pc_bilinear_xyz = rgb2xyz(pc_bilinear, 'WhitePoint', wp);
 
-ppi = 72;
-distance = 500 / 25.4;
+ppi = 120;
+distance = 5000 / 25.4;
 sampPerDeg = ppi * distance * tan(pi/180);
 
 scie_bicubic = scielab(sampPerDeg, pc_xyz, pc_bicubic_xyz, wp, 'xyz');
@@ -162,11 +162,11 @@ c3_scie = scielab(sampPerDeg, c3_xyz);
 c4_scie = scielab(sampPerDeg, c4_xyz);
 c5_scie = scielab(sampPerDeg, c5_xyz);
 
-c1_std = std(c1_scie(:));
-c2_std = std(c2_scie(:));
-c3_std = std(c3_scie(:));
-c4_std = std(c4_scie(:));
-c5_std = std(c5_scie(:));
+c1_std = std2(c1_scie(:,:,1))+std2(c1_scie(:,:,2))+std2(c1_scie(:,:,3));
+c2_std = std2(c2_scie(:,:,1))+std2(c2_scie(:,:,2))+std2(c2_scie(:,:,3));
+c3_std = std2(c3_scie(:,:,1))+std2(c3_scie(:,:,2))+std2(c3_scie(:,:,3));
+c4_std = std2(c4_scie(:,:,1))+std2(c4_scie(:,:,2))+std2(c4_scie(:,:,3));
+c5_std = std2(c5_scie(:,:,1))+std2(c5_scie(:,:,2))+std2(c5_scie(:,:,3));
 
 disp(['c1 std: ' num2str(c1_std) ' c2 std: ' num2str(c2_std) ' c3 std: ' num2str(c3_std) ' c4 std: ' num2str(c4_std) ' c5 std: ' num2str(c5_std)])
 
@@ -176,3 +176,40 @@ subplot(2, 3, 3), imshow(c3);
 subplot(2, 3, 4), imshow(c4);
 subplot(2, 3, 5), imshow(c5);
 
+%% 5 SSIM
+
+% a
+for i = 1:size(p, 2)
+    if (mod(i, 2) == 0)
+        p_dist1(i, :) = p(i, :) + 0.1;
+    else
+        p_dist1(i, :) = p(i, :) - 0.1;
+    end
+    
+    if (i < (size(p, 2) / 2))
+        p_dist2(i, :) = p(i, :) + 0.1;
+    else
+        p_dist2(i, :) = p(i, :) - 0.1;
+    end
+end
+
+snr_dist1 = snr(p, p - p_dist1);
+snr_dist2 = snr(p, p - p_dist2);
+ssim_dist1 = ssim(p_dist1, p);
+ssim_dist2 = ssim(p_dist2, p);
+
+subplot(1, 2, 1), imshow(p_dist1);
+subplot(1, 2, 2), imshow(p_dist2);
+
+% b
+p_dist3 = p + 0.2 * (rand(size(p)) - 0.5);
+filt = fspecial('gauss', 21, 10);
+p_dist4 = imfilter(p, filt);
+
+snr_dist3 = snr(p, p - p_dist3);
+snr_dist4 = snr(p, p - p_dist4);
+ssim_dist3 = ssim(p_dist3, p);
+ssim_dist4 = ssim(p_dist4, p);
+
+subplot(1, 2, 1), imshow(p_dist3);
+subplot(1, 2, 2), imshow(p_dist4);
