@@ -111,4 +111,38 @@ disp(['thresh max: ' num2str(diff_thresh_hsv_max) ' mean: ' num2str(diff_thresh_
 disp(['dither max: ' num2str(diff_dither_hsv_max) ' mean: ' num2str(diff_dither_hsv_mean)])
 disp('Oh! Piece of candy!');
 
+%% 4.1 S-CIELab as a full-reference metric
+
+addpath('scielab');
+wp = [95.047 100.00 108.883];
+pc_bicubic = imresize(imresize(pc,0.25,'bicubic'),4,'bicubic');
+pc_nearest = imresize(imresize(pc,0.25,'nearest'),4,'nearest');
+pc_bilinear = imresize(imresize(pc,0.25,'bilinear'),4,'bilinear');
+pc_xyz = rgb2xyz(pc, 'WhitePoint', wp);
+pc_bicubic_xyz = rgb2xyz(pc_bicubic, 'WhitePoint', wp);
+pc_nearest_xyz = rgb2xyz(pc_nearest, 'WhitePoint', wp);
+pc_bilinear_xyz = rgb2xyz(pc_bilinear, 'WhitePoint', wp);
+
+ppi = 72;
+distance = 500 / 25.4;
+sampPerDeg = ppi * distance * tan(pi/180);
+
+scie = scielab(sampPerDeg, pc, pc_xyz, wp, 'xyz');
+scie_bicubic = scielab(sampPerDeg, pc_bicubic, pc_bicubic_xyz, wp, 'xyz');
+scie_nearest = scielab(sampPerDeg, pc_nearest, pc_nearest_xyz, wp, 'xyz');
+scie_bilinear = scielab(sampPerDeg, pc_bilinear, pc_bilinear_xyz, wp, 'xyz');
+
+scie_mean = mean(scie(:));
+scie_bicubic_mean = mean(scie_bicubic(:));
+scie_nearest_mean = mean(scie_nearest(:));
+scie_bilinear_mean = mean(scie_bilinear(:));
+
+disp([num2str(scie_mean) ' unchanged ' num2str(scie_nearest_mean) ' nearest ' num2str(scie_bilinear_mean) ' bilinear ' num2str(scie_bicubic_mean) ' bicubic'])
+
+subplot(2,2,1), imshow(pc);
+subplot(2,2,2), imshow(pc_nearest);
+subplot(2,2,3), imshow(pc_bilinear);
+subplot(2,2,4), imshow(pc_bicubic);
+
+%% 4.2 S-CIELab as a no-reference metric
 
